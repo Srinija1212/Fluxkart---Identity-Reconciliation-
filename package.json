@@ -1,0 +1,45 @@
+{
+  "name": "bitespeed-identity-reconciliation",
+  "version": "1.0.0",
+  "description": "Identity reconciliation service for Bitespeed backend task",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "node -e \"const fs=require('fs');fs.mkdirSync('prisma',{recursive:true});if(!fs.existsSync('prisma/dev.db'))fs.closeSync(fs.openSync('prisma/dev.db','w'));\" && prisma db push",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "test": "node -e \"const fs=require('fs');fs.mkdirSync('prisma',{recursive:true});if(!fs.existsSync('prisma/test.db'))fs.closeSync(fs.openSync('prisma/test.db','w'));\" && cross-env DATABASE_URL=file:./test.db prisma db push --skip-generate && cross-env DATABASE_URL=file:./test.db vitest run",
+    "test:watch": "cross-env DATABASE_URL=file:./test.db vitest"
+  },
+  "keywords": [
+    "bitespeed",
+    "identity",
+    "reconciliation",
+    "express",
+    "prisma"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.10",
+    "@types/supertest": "^6.0.2",
+    "cross-env": "^7.0.3",
+    "prisma": "^6.4.1",
+    "supertest": "^7.1.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
+  }
+}
