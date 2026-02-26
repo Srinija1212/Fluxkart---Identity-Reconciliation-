@@ -1,70 +1,37 @@
 # Bitespeed Backend Task - Identity Reconciliation
 
-This project implements the `/identify` endpoint for reconciling shopper identities across multiple emails/phone numbers.
-It also includes a small browser UI at `/` for quick manual testing.
+This is my solution for the Bitespeed backend assignment.
 
-## Stack
+It exposes the required `POST /identify` API and also includes a small browser UI at `/` so the flow can be tested without Postman.
+
+## Tech Stack
 - Node.js + TypeScript
 - Express
 - Prisma ORM
-- SQLite (SQL relational database)
+- SQLite (SQL relational DB)
 - Vitest + Supertest
 - Docker + Docker Compose
 
-## Hosted Endpoint
-- Add your live URL here after deployment: `https://<your-app>/identify`
-
-## Data Model
-Prisma model mirrors the task spec:
-
-- `id` (Int, PK, auto-increment)
-- `phoneNumber` (String, nullable)
-- `email` (String, nullable)
-- `linkedId` (Int, nullable)
-- `linkPrecedence` (`primary | secondary`)
-- `createdAt`, `updatedAt`, `deletedAt`
-
-## Reconciliation Rules Implemented
-- If no matching contact exists by `email` or `phoneNumber`, create a new `primary`.
-- If one linked group exists and request introduces new contact info, create a new `secondary`.
-- If request connects multiple `primary` contacts, the oldest primary stays primary and newer primaries become secondary.
-- Always return the consolidated response shape with:
-  - `primaryContatctId` (kept as task-specified key spelling)
-  - `emails` (primary email first)
-  - `phoneNumbers` (primary phone first)
-  - `secondaryContactIds`
-
-## Run Locally (without Docker)
-1. Install dependencies:
-```bash
-npm install
-```
-2. Create env file:
-```powershell
-Copy-Item .env.example .env
-```
-3. Generate Prisma client + sync DB:
-```bash
-npm run prisma:generate
-npm run prisma:push
-```
-4. Start dev server:
-```bash
-npm run dev
+## Project Structure
+```text
+src/
+  app.ts
+  server.ts
+  routes/identify.ts
+  services/identity.ts
+  validation/identify.ts
+  middleware/error-handler.ts
+prisma/
+  schema.prisma
+public/
+  index.html
+  styles.css
+  app.js
+tests/
+  identify.test.ts
 ```
 
-Server runs on `http://localhost:3000`.
-- Browser interface: `http://localhost:3000/`
-
-## Run with Docker
-```bash
-docker compose up --build
-```
-
-Server runs on `http://localhost:3000`.
-- Browser interface: `http://localhost:3000/`
-
-## API Contract
+## API
 ### Endpoint
 `POST /identify`
 
@@ -76,9 +43,12 @@ Server runs on `http://localhost:3000`.
 }
 ```
 
-`email` and `phoneNumber` are optional individually, but at least one must be present.
+Notes:
+- `email` is optional
+- `phoneNumber` is optional
+- at least one of them must be present
 
-### Success Response (200)
+### Success Response
 ```json
 {
   "contact": {
@@ -90,13 +60,54 @@ Server runs on `http://localhost:3000`.
 }
 ```
 
-### Validation Error (400)
-If both `email` and `phoneNumber` are missing/empty.
+`primaryContatctId` key is intentionally kept with this spelling to match the assignment spec.
 
-## Quick Postman Tests
-Use `POST http://localhost:3000/identify` with JSON body.
+## Reconciliation Behavior Implemented
+1. No match by email/phone -> create a new `primary` contact.
+2. Match found + incoming request has new info -> create a new `secondary` contact.
+3. If request connects two previously separate primaries -> oldest primary stays primary, newer primary becomes secondary.
+4. Response always returns consolidated emails, phone numbers, and secondary contact ids for that identity cluster.
 
-1. New primary
+## Run Locally (Command Prompt)
+```cmd
+cd /d C:\Users\HP\Downloads\assignment-bitespeed
+npm install
+copy .env.example .env
+npm run prisma:generate
+npm run prisma:push
+npm run dev
+```
+
+Default URL:
+- UI: `http://localhost:3000/`
+- Health: `http://localhost:3000/health`
+- API: `http://localhost:3000/identify`
+
+If port 3000 is busy:
+```cmd
+set PORT=3001
+npm run dev
+```
+
+## Run with Docker
+```cmd
+cd /d C:\Users\HP\Downloads\assignment-bitespeed
+docker compose up -d --build
+```
+
+Stop:
+```cmd
+docker compose down
+```
+
+Docker URL with current compose config:
+- UI: `http://localhost:3001/`
+- API: `http://localhost:3001/identify`
+
+## Postman Quick Checks
+Use `POST http://localhost:<port>/identify` with `raw` JSON body.
+
+1. Create primary
 ```json
 {
   "email": "lorraine@hillvalley.edu",
@@ -104,7 +115,7 @@ Use `POST http://localhost:3000/identify` with JSON body.
 }
 ```
 
-2. Secondary creation
+2. Create secondary
 ```json
 {
   "email": "mcfly@hillvalley.edu",
@@ -112,28 +123,54 @@ Use `POST http://localhost:3000/identify` with JSON body.
 }
 ```
 
-3. Lookup with only phone
+3. Lookup by phone
 ```json
 {
   "phoneNumber": "123456"
 }
 ```
 
-4. Lookup with only email
+4. Lookup by email
 ```json
 {
   "email": "mcfly@hillvalley.edu"
 }
 ```
 
-## Run Tests
-```bash
+## Tests
+Run:
+```cmd
 npm test
 ```
 
-Covered scenarios:
+Current tests cover:
 - new primary creation
-- secondary creation for new information
-- idempotent repeat requests
-- primary merge behavior
-- request validation
+- secondary creation
+- repeat request idempotency
+- merge of two primaries
+- validation error when both fields are missing
+
+## Assignment Requirement Checklist
+- [x] `POST /identify` implemented
+- [x] JSON body input (`email`, `phoneNumber`) implemented
+- [x] Relational SQL database used
+- [x] Contact linking by shared email/phone implemented
+- [x] Oldest record treated as primary
+- [x] Secondary creation when new linked info comes in
+- [x] Primary can become secondary when two primaries are connected
+- [x] Consolidated response format implemented
+- [x] Code pushed in small meaningful commits (local git history ready)
+- [ ] Hosted endpoint URL added in README
+
+## Hosted Endpoint
+Add after deployment:
+
+`https://<your-deployed-domain>/identify`
+
+## Git History (local)
+Commits already created in this project:
+- `chore: bootstrap typescript express service with prisma schema`
+- `feat: implement /identify reconciliation flow with transactional merging`
+- `test: add coverage for reconciliation scenarios and dockerized runbook`
+- `chore: ignore local sqlite test artifacts`
+- `feat: add browser interface for /identify endpoint`
