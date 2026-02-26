@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitespeed Identity Reconciliation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">FluxKart x Bitespeed</p>
+        <h1>Identity Reconciliation Console</h1>
+        <p>
+          Enter any email/phone combination. The tool calls <code>/identify</code> and shows the
+          consolidated customer record.
+        </p>
+      </section>
+
+      <section class="card">
+        <form id="identify-form" novalidate>
+          <label for="email">Email (optional)</label>
+          <input id="email" name="email" type="email" placeholder="mcfly@hillvalley.edu" />
+
+          <label for="phoneNumber">Phone Number (optional)</label>
+          <input id="phoneNumber" name="phoneNumber" type="text" placeholder="123456" />
+
+          <div class="actions">
+            <button type="submit" id="submit-btn">Identify Contact</button>
+            <button type="button" class="secondary" id="clear-btn">Clear</button>
+          </div>
+        </form>
+
+        <div class="samples">
+          <p>Quick sample payloads:</p>
+          <button type="button" class="chip" data-email="lorraine@hillvalley.edu" data-phone="123456">
+            New Primary
+          </button>
+          <button type="button" class="chip" data-email="mcfly@hillvalley.edu" data-phone="123456">
+            Create Secondary
+          </button>
+          <button type="button" class="chip" data-email="" data-phone="123456">
+            Lookup by Phone
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="result-head">
+          <h2>Response</h2>
+          <span id="status-pill" class="pill">Idle</span>
+        </div>
+        <pre id="response-box">{
+  "contact": {
+    "primaryContatctId": null,
+    "emails": [],
+    "phoneNumbers": [],
+    "secondaryContactIds": []
+  }
+}</pre>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

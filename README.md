@@ -1,6 +1,7 @@
 # Bitespeed Backend Task - Identity Reconciliation
 
 This project implements the `/identify` endpoint for reconciling shopper identities across multiple emails/phone numbers.
+It also includes a small browser UI at `/` for quick manual testing.
 
 ## Stack
 - Node.js + TypeScript
@@ -53,6 +54,7 @@ npm run dev
 ```
 
 Server runs on `http://localhost:3000`.
+- Browser interface: `http://localhost:3000/`
 
 ## Run with Docker
 ```bash
@@ -60,6 +62,7 @@ docker compose up --build
 ```
 
 Server runs on `http://localhost:3000`.
+- Browser interface: `http://localhost:3000/`
 
 ## API Contract
 ### Endpoint
