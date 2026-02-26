@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bitespeed-identity-reconciliation
+    env: node
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /health
+    buildCommand: npm install && npm run prisma:generate && npm run build
+    startCommand: npm run prisma:push && npm start
+    envVars:
+      - key: DATABASE_URL
+        value: file:./dev.db
