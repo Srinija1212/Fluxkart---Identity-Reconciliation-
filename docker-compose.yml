@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    container_name: bitespeed-api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "file:./dev.db"
+      PORT: 3000
+    volumes:
+      - prisma_data:/app/prisma
+
+volumes:
+  prisma_data:
